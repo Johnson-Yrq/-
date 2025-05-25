@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>德国骨科医院 - 移动端检验设备管理系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #F8F9FE;
+            line-height: 1.6;
+        }
+
+        /* 容器布局 */
+        .demo-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .demo-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .demo-title h1 {
+            font-family: 'Inter', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            color: #1F2024;
+            margin-bottom: 10px;
+            line-height: 1.21;
+        }
+
+        .demo-title p {
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 400;
+            color: #71727A;
+            line-height: 1.43;
+        }
+
+        /* 手机展示网格 */
+        .phones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(375px, 1fr));
+            gap: 40px;
+            justify-items: center;
+        }
+
+        /* iPhone 外框样式 - 基于Figma设计 */
+        .iphone-frame {
+            width: 375px;
+            height: 812px;
+            background: #1a1a1a;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            position: relative;
+        }
+
+        .iphone-screen {
+            width: 100%;
+            height: 100%;
+            background: #F8F9FE;
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 刘海屏设计 */
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 30px;
+            background: #1a1a1a;
+            border-radius: 0 0 20px 20px;
+            z-index: 1000;
+        }
+
+        /* 状态栏 - 基于Figma设计 */
+        .status-bar {
+            height: 44px;
+            background: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: relative;
+            z-index: 999;
+        }
+
+        .status-left {
+            font-family: 'SF UI Text', sans-serif;
+            font-weight: 600;
+            font-size: 15px;
+            color: #000000;
+            letter-spacing: -0.5px;
+        }
+
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #0D1B34;
+            font-size: 14px;
+        }
+
+        /* 主要内容区域 */
+        .mobile-content {
+            height: calc(100% - 44px);
+            background: #F8F9FE;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* 顶部问候区域 - 基于Figma设计 */
+        .greeting-section {
+            padding: 24px 16px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #FFFFFF;
+            margin-bottom: 0;
+        }
+
+        .greeting-text h2 {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            color: #71727A;
+            margin-bottom: 8px;
+            line-height: 1.43;
+        }
+
+        .greeting-text h1 {
+            font-family: 'Inter', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            color: #1F2024;
+            line-height: 1.21;
+            letter-spacing: 1%;
+        }
+
+        .user-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #006FFD, #4A90FF);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        /* 搜索框 - 基于Figma设计 */
+        .search-section {
+            padding: 0 16px 16px;
+            background: #FFFFFF;
+        }
+
+        .search-box {
+            background: #F8F9FE;
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid #D4D6DD;
+            box-shadow: none;
+        }
+
+        .search-icon {
+            color: #71727A;
+            font-size: 20px;
+        }
+
+        .search-input {
+            border: none;
+            background: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            color: #71727A;
+            flex: 1;
+            outline: none;
+        }
+
+        /* 预约卡片 - 基于Figma设计 */
+        .appointment-card {
+            margin: 0 16px 24px;
+            background: #EAF2FF;
+            border-radius: 16px;
+            padding: 24px;
+            color: #1F2024;
+            border: 1px solid #006FFD;
+        }
+
+        .appointment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .doctor-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .doctor-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #CBE1FF;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="%23CBE1FF"/><circle cx="24" cy="18" r="8" fill="%234894FE"/><path d="M8 40c0-8.8 7.2-16 16-16s16 7.2 16 16" fill="%234894FE"/></svg>');
+        }
+
+        .doctor-info-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .doctor-info-text h4 {
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: #1C1C1E;
+            margin-bottom: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+
+        .doctor-info-text p {
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            color: #8E8E93;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            line-height: 1.33;
+        }
+
+        .arrow-icon {
+            color: #006FFD;
+            font-size: 20px;
+        }
+
+        .appointment-divider {
+            height: 1px;
+            background: rgba(0, 111, 253, 0.2);
+            margin: 16px 0;
+        }
+
+        .appointment-details {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-icon {
+            font-size: 16px;
+            color: #006FFD;
+        }
+
+        .detail-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 400;
+            color: #1F2024;
+            line-height: 1.33;
+            letter-spacing: 1%;
+        }
+
+        /* 快捷功能区域 - 基于Figma设计 */
+        .quick-actions {
+            padding: 0 16px 24px;
+            background: #FFFFFF;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            max-width: 300px;
+            width: 100%;
+        }
+
+        .action-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            height: 90px;
+        }
+
+        .action-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: #F8F9FE;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #006FFD;
+            font-size: 22px;
+            transition: all 0.2s ease;
+            border: 1px solid #D4D6DD;
+        }
+
+        .action-icon:hover {
+            background: #EAF2FF;
+            transform: translateY(-2px);
+            border-color: #006FFD;
+        }
+
+        .action-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 400;
+            color: #71727A;
+            text-align: center;
+            line-height: 1.33;
+            letter-spacing: 1%;
+        }
+
+        /* 近期医生区域 */
+        .near-doctors {
+            padding: 16px 16px 0;
+        }
+
+        .section-title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1C1C1E;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        /* 数据列表标题 */
+        .data-list-title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1C1C1E;
+            margin-bottom: 8px;
+            line-height: 1.2;
+            padding: 8px 16px 0;
+            background: #F8F9FE;
+        }
+
+        .doctors-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .doctor-card {
+            background: #FFFFFF;
+            border-radius: 12px;
+            padding: 20px 16px;
+            box-shadow: 2px 12px 20px 0px rgba(90, 117, 167, 0.04);
+            border: 1px solid #F5F5F5;
+        }
+
+        .doctor-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            gap: 12px;
+        }
+
+        .doctor-main-info {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .doctor-card-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #FAFAFA;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="%23FAFAFA"/><circle cx="24" cy="18" r="8" fill="%234894FE"/><path d="M8 40c0-8.8 7.2-16 16-16s16 7.2 16 16" fill="%234894FE"/></svg>');
+        }
+
+        .distance-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #8E8E93;
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.33;
+        }
+
+        .doctor-card-divider {
+            height: 1px;
+            background: #F5F5F5;
+            margin: 20px 0;
+        }
+
+        .doctor-card-footer {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .footer-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        .footer-item.open {
+            color: #4894FE;
+        }
+
+        .footer-item.rating {
+            color: #FEB052;
+        }
+
+        /* 统计卡片 */
+        .stats-section {
+            padding: 0 16px 16px;
+            background: #F8F9FE;
+        }
+
+        /* 首页上半部分白色背景 */
+        .home-top-section {
+            background: #FFFFFF;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+            margin-top: 16px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #F2F2F7;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            height: auto;
+        }
+
+        .stat-icon {
+            display: none;
+        }
+
+        .stat-label {
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            color: rgba(0, 0, 0, 0.6);
+            line-height: 1.43;
+            letter-spacing: 1.79%;
+            text-align: center;
+            order: 1;
+            margin: 0;
+        }
+
+        .stat-number {
+            font-family: 'Roboto', sans-serif;
+            font-size: 34px;
+            font-weight: 400;
+            color: #000000;
+            line-height: 1.06;
+            text-align: center;
+            order: 2;
+            margin: 0;
+        }
+
+        .stat-change {
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.43;
+            letter-spacing: 1.79%;
+            text-align: center;
+            order: 3;
+            margin: 0;
+            padding: 0;
+            border-radius: 0;
+            display: block;
+        }
+
+        .stat-change.positive {
+            color: #43A047;
+            background: none;
+        }
+
+        .stat-change.negative {
+            color: #E53935;
+            background: none;
+        }
+
+        /* 图表卡片 */
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid #F2F2F7;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+            color: #1F2024;
+            line-height: 1.21;
+            letter-spacing: 0.5%;
+        }
+
+        .chart-control {
+            font-family: 'Roboto', sans-serif;
+            font-size: 12px;
+            font-weight: 400;
+            color: #8E8E93;
+            background: #F2F2F7;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .chart-content {
+            height: 200px;
+            position: relative;
+        }
+
+        /* 设备卡片 */
+        .device-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid #F2F2F7;
+        }
+
+        .device-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .device-info h3 {
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1C1C1E;
+            margin-bottom: 5px;
+            line-height: 1.2;
+        }
+
+        .device-info p {
+            font-family: 'Roboto', sans-serif;
+            font-size: 12px;
+            font-weight: 400;
+            color: #8E8E93;
+            line-height: 1.33;
+        }
+
+        .device-status {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .device-status.online {
+            background: rgba(92, 200, 190, 0.1);
+            color: #5CC8BE;
+        }
+
+        .device-status.maintenance {
+            background: rgba(175, 82, 222, 0.1);
+            color: #AF52DE;
+        }
+
+        .device-status.offline {
+            background: rgba(88, 86, 214, 0.1);
+            color: #5856D6;
+        }
+
+        .device-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            color: #006FFD;
+            margin-bottom: 5px;
+            line-height: 1.21;
+            letter-spacing: 0.5%;
+        }
+
+        .metric-label {
+            font-family: 'Roboto', sans-serif;
+            font-size: 11px;
+            font-weight: 400;
+            color: #8E8E93;
+            line-height: 1.33;
+        }
+
+        /* 警报样式 */
+        .alert {
+            background: rgba(175, 82, 222, 0.05);
+            border: 1px solid rgba(175, 82, 222, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alert.critical {
+            background: rgba(88, 86, 214, 0.05);
+            border-color: rgba(88, 86, 214, 0.2);
+        }
+
+        .alert-icon {
+            color: #AF52DE;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .alert.critical .alert-icon {
+            color: #5856D6;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1C1C1E;
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+
+        .alert-desc {
+            font-family: 'Roboto', sans-serif;
+            font-size: 12px;
+            font-weight: 400;
+            color: #8E8E93;
+            line-height: 1.33;
+        }
+
+        /* 页面标题 */
+        .page-title {
+            background: white;
+            padding: 20px 16px;
+            border-bottom: 1px solid #D4D6DD;
+            text-align: center;
+        }
+
+        .page-title h1 {
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1F2024;
+            line-height: 1.21;
+            letter-spacing: 0.5%;
+        }
+
+        /* 数据列表 */
+        .data-list {
+            padding: 0 16px 16px;
+        }
+
+        .data-item {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            border: 1px solid #F2F2F7;
+        }
+
+        .data-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .data-title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1C1C1E;
+            line-height: 1.2;
+        }
+
+        .data-time {
+            font-family: 'Roboto', sans-serif;
+            font-size: 11px;
+            font-weight: 400;
+            color: #8E8E93;
+            line-height: 1.33;
+        }
+
+        .data-content {
+            font-family: 'Roboto', sans-serif;
+            font-size: 12px;
+            font-weight: 400;
+            color: #8E8E93;
+            line-height: 1.4;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .phones-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .demo-container {
+                padding: 20px 10px;
+            }
+        }
+
+        /* 滚动条样式 */
+        .mobile-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .mobile-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .mobile-content::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 2px;
+        }
+
+        /* 手机标签 */
+        .phone-label {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #0D1B34;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-title">
+            <h1>德国骨科医院 - 移动端检验设备管理系统</h1>
+            <p>基于 Dokterian 设计风格的医疗管理应用界面展示</p>
+        </div>
+
+        <div class="phones-grid">
+            <!-- 首页 -->
+            <div>
+                <div class="phone-label">首页 - 总览看板</div>
+                <div class="iphone-frame">
+                    <div class="iphone-screen">
+                        <div class="notch"></div>
+                        
+                        <div class="status-bar">
+                            <div class="status-left">9:41</div>
+                            <div class="status-right">
+                                <i class="fas fa-signal"></i>
+                                <i class="fas fa-wifi"></i>
+                                <i class="fas fa-battery-three-quarters"></i>
+                            </div>
+                        </div>
+
+                        <div class="mobile-content">
+                            <div class="home-top-section">
+                                <div class="greeting-section">
+                                    <div class="greeting-text">
+                                        <h2>Hello,</h2>
+                                        <h1>Dr. 张医生</h1>
+                                    </div>
+                                    <div class="user-avatar">
+                                        <i class="fas fa-user-md"></i>
+                                    </div>
+                                </div>
+
+                                <div class="search-section">
+                                    <div class="search-box">
+                                        <i class="fas fa-search search-icon"></i>
+                                        <input type="text" class="search-input" placeholder="搜索设备或检验项目">
+                                    </div>
+                                </div>
+
+                                <div class="appointment-card">
+                                    <div class="appointment-header">
+                                        <div class="doctor-info">
+                                            <div class="doctor-avatar"></div>
+                                            <div class="doctor-info-text">
+                                                <h4>生化分析仪-01</h4>
+                                                <p>检验科设备</p>
+                                            </div>
+                                        </div>
+                                        <i class="fas fa-chevron-right arrow-icon"></i>
+                                    </div>
+                                    <div class="appointment-divider"></div>
+                                    <div class="appointment-details">
+                                        <div class="detail-item">
+                                            <i class="fas fa-calendar detail-icon"></i>
+                                            <span class="detail-text">今日检测: 156次</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <i class="fas fa-clock detail-icon"></i>
+                                            <span class="detail-text">运行时间: 98.5%</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="quick-actions">
+                                    <div class="actions-grid">
+                                        <div class="action-item">
+                                            <div class="action-icon">
+                                                <i class="fas fa-virus"></i>
+                                            </div>
+                                            <div class="action-label">POCT检验</div>
+                                        </div>
+                                        <div class="action-item">
+                                            <div class="action-icon">
+                                                <i class="fas fa-user-md"></i>
+                                            </div>
+                                            <div class="action-label">设备管理</div>
+                                        </div>
+                                        <div class="action-item">
+                                            <div class="action-icon">
+                                                <i class="fas fa-pills"></i>
+                                            </div>
+                                            <div class="action-label">试剂管理</div>
+                                        </div>
+                                        <div class="action-item">
+                                            <div class="action-icon">
+                                                <i class="fas fa-hospital"></i>
+                                            </div>
+                                            <div class="action-label">质控分析</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="stats-section">
+                                <div class="stats-grid">
+                                    <div class="stat-card primary">
+                                        <div class="stat-icon">
+                                            <i class="fas fa-microscope"></i>
+                                        </div>
+                                        <div class="stat-number">1,247</div>
+                                        <div class="stat-label">今日检验总数</div>
+                                        <div class="stat-change positive">+12%</div>
+                                    </div>
+                                    
+                                    <div class="stat-card danger">
+                                        <div class="stat-icon">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                        </div>
+                                        <div class="stat-number">12</div>
+                                        <div class="stat-label">危急值警报</div>
+                                        <div class="stat-change negative">-3%</div>
+                                    </div>
+                                    
+                                    <div class="stat-card success">
+                                        <div class="stat-icon">
+                                            <i class="fas fa-desktop"></i>
+                                        </div>
+                                        <div class="stat-number">22/24</div>
+                                        <div class="stat-label">设备在线率</div>
+                                        <div class="stat-change positive">+2%</div>
+                                    </div>
+                                    
+                                    <div class="stat-card warning">
+                                        <div class="stat-icon">
+                                            <i class="fas fa-vial"></i>
+                                        </div>
+                                        <div class="stat-number">8</div>
+                                        <div class="stat-label">试剂库存不足</div>
+                                        <div class="stat-change positive">0%</div>
+                                    </div>
+                                </div>
+
+                                <div class="chart-card">
+                                    <div class="chart-header">
+                                        <div class="chart-title">检验数据趋势</div>
+                                        <select class="chart-control">
+                                            <option>本月</option>
+                                            <option>本周</option>
+                                            <option>今日</option>
+                                        </select>
+                                    </div>
+                                    <div class="chart-content">
+                                        <canvas id="overviewChart1"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- POCT检验页面 -->
+            <div>
+                <div class="phone-label">POCT检验管理</div>
+                <div class="iphone-frame">
+                    <div class="iphone-screen">
+                        <div class="notch"></div>
+                        
+                        <div class="status-bar">
+                            <div class="status-left">9:41</div>
+                            <div class="status-right">
+                                <i class="fas fa-signal"></i>
+                                <i class="fas fa-wifi"></i>
+                                <i class="fas fa-battery-three-quarters"></i>
+                            </div>
+                        </div>
+
+                        <div class="mobile-content">
+                            <div class="page-title">
+                                <h1>POCT检验数据</h1>
+                            </div>
+
+                            <div class="stats-section">
+                                <div class="stats-grid">
+                                    <div class="stat-card primary">
+                                        <div class="stat-icon">
+                                            <i class="fas fa-procedures"></i>
+                                        </div>
+                                        <div class="stat-number">18</div>
+                                        <div class="stat-label">POCT设备数量</div>
+                                        <div class="stat-change positive">+2台</div>
+                                    </div>
+                                    
+                                    <div class="stat-card success">
+                                        <div class="stat-icon">
+                                            <i class="fas fa-heartbeat"></i>
+                                        </div>
+                                        <div class="stat-number">485</div>
+                                        <div class="stat-label">今日检测次数</div>
+                                        <div class="stat-change positive">+12%</div>
+                                    </div>
+                                    
+                                    <div class="stat-card warning">
+                                        <div class="stat-icon">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <div class="stat-number">8min</div>
+                                        <div class="stat-label">平均检测时间</div>
+                                        <div class="stat-change positive">-1.5min</div>
+                                    </div>
+                                    
+                                    <div class="stat-card primary">
+                                        <div class="stat-icon">
+                                            <i class="fas fa-chart-pie"></i>
+                                        </div>
+                                        <div class="stat-number">94.2%</div>
+                                        <div class="stat-label">设备在线率</div>
+                                        <div class="stat-change positive">+0.8%</div>
+                                    </div>
+                                </div>
+
+                                <div class="chart-card">
+                                    <div class="chart-header">
+                                        <div class="chart-title">POCT科室分布</div>
+                                    </div>
+                                    <div class="chart-content">
+                                        <canvas id="poctChart1"></canvas>
+                                    </div>
+                                </div>
+
+                                <div class="chart-card">
+                                    <div class="chart-header">
+                                        <div class="chart-title">检测项目统计</div>
+                                    </div>
+                                    <div class="chart-content">
+                                        <canvas id="poctChart2"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="data-list-title">检验数据</div>
+
+                            <div class="data-list">
+                                <div class="data-item">
+                                    <div class="data-header">
+                                        <div class="data-title">急诊科 - 血糖检测</div>
+                                        <div class="data-time">09:15</div>
+                                    </div>
+                                    <div class="data-content">
+                                        设备: POCT-急诊-01 | 检测次数: 28 | 平均时长: 3分钟
+                                    </div>
+                                </div>
+
+                                <div class="data-item">
+                                    <div class="data-header">
+                                        <div class="data-title">骨科一病区 - CRP检测</div>
+                                        <div class="data-time">09:20</div>
+                                    </div>
+                                    <div class="data-content">
+                                        设备: POCT-骨科-01 | 检测次数: 15 | 平均时长: 8分钟
+                                    </div>
+                                </div>
+
+                                <div class="data-item">
+                                    <div class="data-header">
+                                        <div class="data-title">ICU - 血气分析</div>
+                                        <div class="data-time">09:35</div>
+                                    </div>
+                                    <div class="data-content">
+                                        设备: POCT-ICU-01 | 检测次数: 12 | 平均时长: 5分钟
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 设备管理页面 -->
+            <div>
+                <div class="phone-label">设备状态管理</div>
+                <div class="iphone-frame">
+                    <div class="iphone-screen">
+                        <div class="notch"></div>
+                        
+                        <div class="status-bar">
+                            <div class="status-left">9:41</div>
+                            <div class="status-right">
+                                <i class="fas fa-signal"></i>
+                                <i class="fas fa-wifi"></i>
+                                <i class="fas fa-battery-three-quarters"></i>
+                            </div>
+                        </div>
+
+                        <div class="mobile-content">
+                            <div class="page-title">
+                                <h1>设备状态管理</h1>
+                            </div>
+
+                            <div class="near-doctors">
+                                <div class="doctors-list">
+                                    <div class="doctor-card">
+                                        <div class="doctor-card-header">
+                                            <div class="doctor-main-info">
+                                                <div class="doctor-card-avatar"></div>
+                                                <div class="doctor-info-text">
+                                                    <h4>生化分析仪-01</h4>
+                                                    <p>检验科 | 型号: AU5800</p>
+                                                </div>
+                                            </div>
+                                            <div class="device-status online">在线</div>
+                                        </div>
+                                        <div class="doctor-card-divider"></div>
+                                        <div class="device-metrics">
+                                            <div class="metric">
+                                                <div class="metric-value">98.5%</div>
+                                                <div class="metric-label">运行时间</div>
+                                            </div>
+                                            <div class="metric">
+                                                <div class="metric-value">156</div>
+                                                <div class="metric-label">今日检测</div>
+                                            </div>
+                                            <div class="metric">
+                                                <div class="metric-value">92%</div>
+                                                <div class="metric-label">效率</div>
+                                            </div>
+                                            <div class="metric">
+                                                <div class="metric-value">正常</div>
+                                                <div class="metric-label">健康状态</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="doctor-card">
+                                        <div class="doctor-card-header">
+                                            <div class="doctor-main-info">
+                                                <div class="doctor-card-avatar"></div>
+                                                <div class="doctor-info-text">
+                                                    <h4>免疫分析仪-01</h4>
+                                                    <p>检验科 | 型号: ARCHITECT i2000SR</p>
+                                                </div>
+                                            </div>
+                                            <div class="device-status online">在线</div>
+                                        </div>
+                                        <div class="doctor-card-divider"></div>
+                                        <div class="device-metrics">
+                                            <div class="metric">
+                                                <div class="metric-value">96.2%</div>
+                                                <div class="metric-label">运行时间</div>
+                                            </div>
+                                            <div class="metric">
+                                                <div class="metric-value">89</div>
+                                                <div class="metric-label">今日检测</div>
+                                            </div>
+                                            <div class="metric">
+                                                <div class="metric-value">88%</div>
+                                                <div class="metric-label">效率</div>
+                                            </div>
+                                            <div class="metric">
+                                                <div class="metric-value">良好</div>
+                                                <div class="metric-label">健康状态</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="doctor-card">
+                                        <div class="doctor-card-header">
+                                            <div class="doctor-main-info">
+                                                <div class="doctor-card-avatar"></div>
+                                                <div class="doctor-info-text">
+                                                    <h4>血液分析仪-02</h4>
+                                                    <p>检验科 | 型号: XN-3000</p>
+                                                </div>
+                                            </div>
+                                            <div class="device-status maintenance">维护中</div>
+                                        </div>
+                                        <div class="doctor-card-divider"></div>
+                                        <div class="device-metrics">
+                                            <div class="metric">
+                                                <div class="metric-value">0%</div>
+                                                <div class="metric-label">运行时间</div>
+                                            </div>
+                                            <div class="metric">
+                                                <div class="metric-value">0</div>
+                                                <div class="metric-label">今日检测</div>
+                                            </div>
+                                            <div class="metric">
+                                                <div class="metric-value">-</div>
+                                                <div class="metric-label">效率</div>
+                                            </div>
+                                            <div class="metric">
+                                                <div class="metric-value">维护</div>
+                                                <div class="metric-label">健康状态</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 试剂管理页面 -->
+            <div>
+                <div class="phone-label">试剂用量管理</div>
+                <div class="iphone-frame">
+                    <div class="iphone-screen">
+                        <div class="notch"></div>
+                        
+                        <div class="status-bar">
+                            <div class="status-left">9:41</div>
+                            <div class="status-right">
+                                <i class="fas fa-signal"></i>
+                                <i class="fas fa-wifi"></i>
+                                <i class="fas fa-battery-three-quarters"></i>
+                            </div>
+                        </div>
+
+                        <div class="mobile-content">
+                            <div class="page-title">
+                                <h1>试剂用量管理</h1>
+                            </div>
+
+                            <div class="stats-section">
+                                <div class="stats-grid">
+                                    <div class="stat-card primary">
+                                        <div class="stat-icon">
+                                            <i class="fas fa-vials"></i>
+                                        </div>
+                                        <div class="stat-number">128</div>
+                                        <div class="stat-label">试剂种类</div>
+                                        <div class="stat-change positive">+5种</div>
+                                    </div>
+                                    
+                                    <div class="stat-card warning">
+                                        <div class="stat-icon">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </div>
+                                        <div class="stat-number">15</div>
+                                        <div class="stat-label">库存不足</div>
+                                        <div class="stat-change negative">+3种</div>
+                                    </div>
+                                    
+                                    <div class="stat-card danger">
+                                        <div class="stat-icon">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <div class="stat-number">8</div>
+                                        <div class="stat-label">即将过期</div>
+                                        <div class="stat-change positive">-2种</div>
+                                    </div>
+                                    
+                                    <div class="stat-card success">
+                                        <div class="stat-icon">
+                                            <i class="fas fa-dollar-sign"></i>
+                                        </div>
+                                        <div class="stat-number">¥286k</div>
+                                        <div class="stat-label">月均消耗成本</div>
+                                        <div class="stat-change positive">-8%</div>
+                                    </div>
+                                </div>
+
+                                <div class="chart-card">
+                                    <div class="chart-header">
+                                        <div class="chart-title">试剂库存状态</div>
+                                    </div>
+                                    <div class="chart-content">
+                                        <canvas id="reagentChart1"></canvas>
+                                    </div>
+                                </div>
+
+                                <div class="chart-card">
+                                    <div class="chart-header">
+                                        <div class="chart-title">月度消耗趋势</div>
+                                    </div>
+                                    <div class="chart-content">
+                                        <canvas id="reagentChart2"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="data-list-title">库存警报</div>
+
+                            <div class="data-list">
+                                <div class="alert warning">
+                                    <div class="alert-icon">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </div>
+                                    <div class="alert-content">
+                                        <div class="alert-title">库存不足警报</div>
+                                        <div class="alert-desc">肝功能检测试剂盒库存仅剩5盒</div>
+                                    </div>
+                                </div>
+
+                                <div class="alert critical">
+                                    <div class="alert-icon">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div class="alert-content">
+                                        <div class="alert-title">即将过期</div>
+                                        <div class="alert-desc">TSH检测试剂将于2024-12-15过期</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 警报中心页面 -->
+            <div>
+                <div class="phone-label">警报中心</div>
+                <div class="iphone-frame">
+                    <div class="iphone-screen">
+                        <div class="notch"></div>
+                        
+                        <div class="status-bar">
+                            <div class="status-left">9:41</div>
+                            <div class="status-right">
+                                <i class="fas fa-signal"></i>
+                                <i class="fas fa-wifi"></i>
+                                <i class="fas fa-battery-three-quarters"></i>
+                            </div>
+                        </div>
+
+                        <div class="mobile-content">
+                            <div class="page-title">
+                                <h1>警报中心</h1>
+                            </div>
+
+                            <div class="data-list-title">实时警报</div>
+
+                            <div class="data-list">
+                                <div class="alert critical">
+                                    <div class="alert-icon">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </div>
+                                    <div class="alert-content">
+                                        <div class="alert-title">危急值警报</div>
+                                        <div class="alert-desc">急诊科 - 血糖: 21.5 mmol/L</div>
+                                    </div>
+                                </div>
+
+                                <div class="alert critical">
+                                    <div class="alert-icon">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </div>
+                                    <div class="alert-content">
+                                        <div class="alert-title">危急值警报</div>
+                                        <div class="alert-desc">骨科一病区 - D-二聚体: 8.2 mg/L</div>
+                                    </div>
+                                </div>
+
+                                <div class="alert warning">
+                                    <div class="alert-icon">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                    </div>
+                                    <div class="alert-content">
+                                        <div class="alert-title">设备警告</div>
+                                        <div class="alert-desc">血液分析仪-02 进入维护模式</div>
+                                    </div>
+                                </div>
+
+                                <div class="alert warning">
+                                    <div class="alert-icon">
+                                        <i class="fas fa-vial"></i>
+                                    </div>
+                                    <div class="alert-content">
+                                        <div class="alert-title">试剂库存警告</div>
+                                        <div class="alert-desc">血糖试纸库存不足，仅剩8盒</div>
+                                    </div>
+                                </div>
+
+                                <div class="alert warning">
+                                    <div class="alert-icon">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div class="alert-content">
+                                        <div class="alert-title">维护提醒</div>
+                                        <div class="alert-desc">免疫分析仪-02 需要进行定期维护</div>
+                                    </div>
+                                </div>
+
+                                <div class="alert critical">
+                                    <div class="alert-icon">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </div>
+                                    <div class="alert-content">
+                                        <div class="alert-title">质控失控</div>
+                                        <div class="alert-desc">TSH质控项目超出控制限</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 质控分析页面 -->
+            <div>
+                <div class="phone-label">质控情况分析</div>
+                <div class="iphone-frame">
+                    <div class="iphone-screen">
+                        <div class="notch"></div>
+                        
+                        <div class="status-bar">
+                            <div class="status-left">9:41</div>
+                            <div class="status-right">
+                                <i class="fas fa-signal"></i>
+                                <i class="fas fa-wifi"></i>
+                                <i class="fas fa-battery-three-quarters"></i>
+                            </div>
+                        </div>
+
+                        <div class="mobile-content">
+                            <div class="page-title">
+                                <h1>质控情况分析</h1>
+                            </div>
+
+                            <div class="stats-section">
+                                <div class="stats-grid">
+                                    <div class="stat-card success">
+                                        <div class="stat-icon">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                        <div class="stat-number">96.8%</div>
+                                        <div class="stat-label">综合达标率</div>
+                                        <div class="stat-change positive">+1.2%</div>
+                                    </div>
+                                    
+                                    <div class="stat-card primary">
+                                        <div class="stat-icon">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <div class="stat-number">28</div>
+                                        <div class="stat-label">今日质控项目</div>
+                                        <div class="stat-change positive">+3</div>
+                                    </div>
+                                    
+                                    <div class="stat-card warning">
+                                        <div class="stat-icon">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                        </div>
+                                        <div class="stat-number">2</div>
+                                        <div class="stat-label">失控项目</div>
+                                        <div class="stat-change positive">-1</div>
+                                    </div>
+                                    
+                                    <div class="stat-card primary">
+                                        <div class="stat-icon">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <div class="stat-number">12min</div>
+                                        <div class="stat-label">平均检测时间</div>
+                                        <div class="stat-change positive">-2min</div>
+                                    </div>
+                                </div>
+
+                                <div class="chart-card">
+                                    <div class="chart-header">
+                                        <div class="chart-title">质控达标率趋势</div>
+                                    </div>
+                                    <div class="chart-content">
+                                        <canvas id="qualityChart1"></canvas>
+                                    </div>
+                                </div>
+
+                                <div class="chart-card">
+                                    <div class="chart-header">
+                                        <div class="chart-title">各科室质控对比</div>
+                                    </div>
+                                    <div class="chart-content">
+                                        <canvas id="qualityChart2"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="data-list-title">质控记录</div>
+
+                            <div class="data-list">
+                                <div class="data-item">
+                                    <div class="data-header">
+                                        <div class="data-title">葡萄糖质控 - 生化分析仪-01</div>
+                                        <div class="data-time">08:30</div>
+                                    </div>
+                                    <div class="data-content">
+                                        目标值: 5.6 mmol/L | 测量值: 5.8 mmol/L | 偏差: +3.6% | 状态: 在控
+                                    </div>
+                                </div>
+
+                                <div class="data-item">
+                                    <div class="data-header">
+                                        <div class="data-title">白蛋白质控 - 生化分析仪-02</div>
+                                        <div class="data-time">08:45</div>
+                                    </div>
+                                    <div class="data-content">
+                                        目标值: 42.0 g/L | 测量值: 45.2 g/L | 偏差: +7.6% | 状态: 警告
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 图表配置 - 基于Figma设计风格
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    display: true,
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            family: 'Roboto',
+                            size: 12,
+                            weight: 400
+                        },
+                        color: '#8E8E93'
+                    }
+                },
+                y: {
+                    display: true,
+                    grid: {
+                        color: '#F2F2F7',
+                        lineWidth: 1,
+                        borderDash: [2, 2]
+                    },
+                    ticks: {
+                        font: {
+                            family: 'Roboto',
+                            size: 12,
+                            weight: 400
+                        },
+                        color: '#8E8E93'
+                    }
+                }
+            },
+            elements: {
+                point: {
+                    radius: 4,
+                    hoverRadius: 6,
+                    borderWidth: 2
+                },
+                line: {
+                    borderWidth: 2,
+                    tension: 0.4
+                },
+                bar: {
+                    borderRadius: 4,
+                    borderSkipped: false
+                }
+            }
+        };
+
+        // 总览图表 - 使用Figma设计颜色
+        const overviewCtx1 = document.getElementById('overviewChart1').getContext('2d');
+        new Chart(overviewCtx1, {
+            type: 'line',
+            data: {
+                labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                datasets: [{
+                    label: '检验数量',
+                    data: [1200, 1350, 1180, 1420, 1380, 1150, 1247],
+                    borderColor: '#006FFD',
+                    backgroundColor: 'rgba(0, 111, 253, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#006FFD',
+                    pointBorderColor: '#FFFFFF',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: chartOptions
+        });
+
+        // POCT图表 - 使用Figma设计颜色
+        const poctCtx1 = document.getElementById('poctChart1').getContext('2d');
+        new Chart(poctCtx1, {
+            type: 'bar',
+            data: {
+                labels: ['急诊科', '骨科', 'ICU', '手术室'],
+                datasets: [{
+                    label: '检测次数',
+                    data: [156, 89, 67, 45],
+                    backgroundColor: ['#006FFD', '#5CC8BE', '#AF52DE', '#5856D6'],
+                    borderRadius: 4,
+                    borderSkipped: false
+                }]
+            },
+            options: chartOptions
+        });
+
+        const poctCtx2 = document.getElementById('poctChart2').getContext('2d');
+        new Chart(poctCtx2, {
+            type: 'doughnut',
+            data: {
+                labels: ['血糖', 'CRP', '血气', '凝血', '心标'],
+                datasets: [{
+                    data: [35, 25, 20, 12, 8],
+                    backgroundColor: ['#006FFD', '#5CC8BE', '#AF52DE', '#5856D6', '#C7C7CC'],
+                    borderWidth: 2,
+                    borderColor: '#FFFFFF',
+                    cutout: '60%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12,
+                            font: {
+                                family: 'Roboto',
+                                size: 10,
+                                weight: 400
+                            },
+                            color: '#8E8E93',
+                            padding: 8,
+                            usePointStyle: true,
+                            pointStyle: 'rect'
+                        }
+                    }
+                }
+            }
+        });
+
+        // 试剂图表 - 使用Figma设计颜色
+        const reagentCtx1 = document.getElementById('reagentChart1').getContext('2d');
+        new Chart(reagentCtx1, {
+            type: 'doughnut',
+            data: {
+                labels: ['正常', '不足', '过期'],
+                datasets: [{
+                    data: [105, 15, 8],
+                    backgroundColor: ['#5CC8BE', '#AF52DE', '#5856D6'],
+                    borderWidth: 2,
+                    borderColor: '#FFFFFF',
+                    cutout: '60%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12,
+                            font: {
+                                family: 'Roboto',
+                                size: 11,
+                                weight: 400
+                            },
+                            color: '#8E8E93',
+                            padding: 8,
+                            usePointStyle: true,
+                            pointStyle: 'rect'
+                        }
+                    }
+                }
+            }
+        });
+
+        const reagentCtx2 = document.getElementById('reagentChart2').getContext('2d');
+        new Chart(reagentCtx2, {
+            type: 'line',
+            data: {
+                labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                datasets: [{
+                    label: '消耗成本',
+                    data: [280, 295, 268, 312, 286, 275],
+                    borderColor: '#AF52DE',
+                    backgroundColor: 'rgba(175, 82, 222, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#AF52DE',
+                    pointBorderColor: '#FFFFFF',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: chartOptions
+        });
+
+        // 质控图表 - 使用Figma设计颜色
+        const qualityCtx1 = document.getElementById('qualityChart1').getContext('2d');
+        new Chart(qualityCtx1, {
+            type: 'line',
+            data: {
+                labels: ['1周', '2周', '3周', '4周'],
+                datasets: [{
+                    label: '达标率',
+                    data: [94.5, 96.2, 95.8, 96.8],
+                    borderColor: '#5CC8BE',
+                    backgroundColor: 'rgba(92, 200, 190, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#5CC8BE',
+                    pointBorderColor: '#FFFFFF',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: chartOptions
+        });
+
+        const qualityCtx2 = document.getElementById('qualityChart2').getContext('2d');
+        new Chart(qualityCtx2, {
+            type: 'bar',
+            data: {
+                labels: ['检验科', '急诊科', 'ICU', '骨科'],
+                datasets: [{
+                    label: '达标率',
+                    data: [98.5, 95.2, 97.8, 94.6],
+                    backgroundColor: ['#006FFD', '#5CC8BE', '#AF52DE', '#5856D6'],
+                    borderRadius: 4,
+                    borderSkipped: false
+                }]
+            },
+            options: chartOptions
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,564 @@
+/* 重置和基础样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* 主容器 */
+.login-container {
+    display: flex;
+    min-height: 100vh;
+    position: relative;
+}
+
+/* 左侧插图区域 */
+.illustration-section {
+    flex: 1;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.logo-section {
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    z-index: 10;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.logo i {
+    font-size: 28px;
+    color: #fff;
+}
+
+/* 医疗插图 */
+.illustration {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.medical-illustration {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.doctor-figure {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 120px;
+    color: rgba(255, 255, 255, 0.9);
+    animation: pulse 3s ease-in-out infinite;
+}
+
+.data-elements {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.data-point {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    color: white;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: float 4s ease-in-out infinite;
+    animation-delay: var(--delay);
+}
+
+.data-point:nth-child(1) {
+    top: 20%;
+    left: 20%;
+}
+
+.data-point:nth-child(2) {
+    top: 30%;
+    right: 15%;
+}
+
+.data-point:nth-child(3) {
+    bottom: 30%;
+    left: 15%;
+}
+
+.data-point:nth-child(4) {
+    bottom: 20%;
+    right: 25%;
+}
+
+.floating-elements {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.float-element {
+    position: absolute;
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.6);
+    animation: floatAround 8s linear infinite;
+    animation-delay: var(--float-delay);
+}
+
+.float-element:nth-child(1) {
+    top: 10%;
+    left: 60%;
+}
+
+.float-element:nth-child(2) {
+    top: 60%;
+    left: 10%;
+}
+
+.float-element:nth-child(3) {
+    top: 80%;
+    left: 70%;
+}
+
+/* 右侧登录区域 */
+.login-section {
+    flex: 1;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    box-shadow: -4px 0 64px rgba(0, 0, 0, 0.05);
+}
+
+.login-form-container {
+    width: 100%;
+    max-width: 420px;
+}
+
+/* 欢迎文本 */
+.welcome-text {
+    margin-bottom: 40px;
+}
+
+.welcome-text h1 {
+    font-size: 25px;
+    font-weight: 300;
+    color: #000;
+    margin-bottom: 8px;
+}
+
+.welcome-text h2 {
+    font-size: 31px;
+    font-weight: 500;
+    color: #000;
+    margin-bottom: 8px;
+}
+
+.welcome-text p {
+    font-size: 16px;
+    font-weight: 400;
+    color: #000;
+    line-height: 1.5;
+}
+
+/* 表单样式 */
+.login-form {
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 16px;
+    font-weight: 400;
+    color: #000;
+    margin-bottom: 8px;
+}
+
+.input-container {
+    position: relative;
+}
+
+.input-container input {
+    width: 100%;
+    height: 59px;
+    padding: 19px 50px 19px 50px;
+    border: 0.6px solid #282828;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 300;
+    color: #000;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.input-container input::placeholder {
+    color: #ABABAB;
+}
+
+.input-container input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.input-container.focused .input-icon {
+    color: #667eea;
+}
+
+.input-icon {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #ABABAB;
+    font-size: 16px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #ABABAB;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 5px;
+    transition: color 0.3s ease;
+    z-index: 2;
+}
+
+.toggle-password:hover {
+    color: #667eea;
+}
+
+/* 表单选项 */
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.remember-me input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    border: 1px solid #000;
+    cursor: pointer;
+}
+
+.remember-me label {
+    font-size: 12px;
+    font-weight: 300;
+    color: #000;
+    cursor: pointer;
+    margin: 0;
+}
+
+.forgot-password {
+    font-size: 12px;
+    font-weight: 300;
+    color: #4D4D4D;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.forgot-password:hover {
+    color: #667eea;
+}
+
+/* 登录按钮 */
+.login-button {
+    width: 100%;
+    height: 57px;
+    background: #000;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-button:hover {
+    background: #333;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.login-button:active {
+    transform: translateY(0);
+}
+
+.button-icon {
+    transition: transform 0.3s ease;
+}
+
+.login-button:hover .button-icon {
+    transform: translateX(5px);
+}
+
+/* 错误消息 */
+.error-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #e74c3c;
+    font-size: 14px;
+    margin-top: 16px;
+    padding: 12px;
+    background: rgba(231, 76, 60, 0.1);
+    border-radius: 6px;
+    border-left: 4px solid #e74c3c;
+}
+
+/* 底部文本 */
+.footer-text {
+    text-align: center;
+}
+
+.footer-text p {
+    font-size: 16px;
+    font-weight: 300;
+    color: #000;
+}
+
+.footer-text a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 400;
+    transition: color 0.3s ease;
+}
+
+.footer-text a:hover {
+    color: #764ba2;
+}
+
+/* 加载动画 */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.loading-spinner {
+    text-align: center;
+    color: white;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+.loading-spinner p {
+    font-size: 16px;
+    font-weight: 300;
+}
+
+/* 动画定义 */
+@keyframes pulse {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.05);
+        opacity: 1;
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes floatAround {
+    0% {
+        transform: translateY(0px) rotate(0deg);
+        opacity: 0.6;
+    }
+    25% {
+        transform: translateY(-10px) rotate(90deg);
+        opacity: 1;
+    }
+    50% {
+        transform: translateY(0px) rotate(180deg);
+        opacity: 0.6;
+    }
+    75% {
+        transform: translateY(10px) rotate(270deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(0px) rotate(360deg);
+        opacity: 0.6;
+    }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+    .login-container {
+        flex-direction: column;
+    }
+    
+    .illustration-section {
+        min-height: 40vh;
+    }
+    
+    .illustration {
+        width: 300px;
+        height: 300px;
+    }
+    
+    .doctor-figure {
+        font-size: 80px;
+    }
+    
+    .data-point {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .login-section {
+        padding: 20px;
+    }
+    
+    .logo-section {
+        top: 20px;
+        left: 20px;
+    }
+    
+    .logo {
+        font-size: 16px;
+    }
+    
+    .logo i {
+        font-size: 20px;
+    }
+    
+    .welcome-text h1 {
+        font-size: 20px;
+    }
+    
+    .welcome-text h2 {
+        font-size: 24px;
+    }
+    
+    .illustration {
+        width: 250px;
+        height: 250px;
+    }
+    
+    .doctor-figure {
+        font-size: 60px;
+    }
+    
+    .data-point {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-options {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+    }
+    
+    .illustration-section {
+        min-height: 30vh;
+    }
+    
+    .illustration {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .doctor-figure {
+        font-size: 40px;
+    }
+    
+    .data-point {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+    }
+} 

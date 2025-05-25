@@ -6,6 +6,9 @@ let sidebarCollapsed = false;
 
 // 初始化页面
 document.addEventListener('DOMContentLoaded', function() {
+    // 首先检查登录状态
+    checkLoginStatus();
+    
     initializeTheme();
     initializeTime();
     initializeSidebar();
@@ -14,7 +17,97 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeDeviceGrid();
     startDataUpdates();
     setupEventListeners();
+    
+    // 初始化用户信息
+    initializeUserInfo();
 });
+
+// 检查登录状态
+function checkLoginStatus() {
+    const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+    const currentUser = sessionStorage.getItem('currentUser');
+    
+    if (!isLoggedIn || isLoggedIn !== 'true' || !currentUser) {
+        // 未登录，跳转到登录页面
+        window.location.href = 'login.html';
+        return false;
+    }
+    
+    return true;
+}
+
+// 初始化用户信息
+function initializeUserInfo() {
+    const currentUser = sessionStorage.getItem('currentUser');
+    const loginTime = sessionStorage.getItem('loginTime');
+    
+    if (currentUser) {
+        // 更新用户信息显示
+        const userNameElement = document.querySelector('.user-name');
+        const userRoleElement = document.querySelector('.user-role');
+        
+        if (userNameElement) {
+            userNameElement.textContent = currentUser === 'admin' ? '管理员' : currentUser;
+        }
+        
+        if (userRoleElement) {
+            userRoleElement.textContent = '系统管理员';
+        }
+        
+        // 添加退出登录功能
+        addLogoutFunctionality();
+    }
+}
+
+// 添加退出登录功能
+function addLogoutFunctionality() {
+    const userInfo = document.querySelector('.user-info');
+    if (userInfo) {
+        // 创建退出按钮
+        const logoutBtn = document.createElement('button');
+        logoutBtn.className = 'logout-btn';
+        logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i>';
+        logoutBtn.title = '退出登录';
+        logoutBtn.style.cssText = `
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        `;
+        
+        logoutBtn.addEventListener('click', logout);
+        logoutBtn.addEventListener('mouseenter', function() {
+            this.style.background = 'rgba(255, 255, 255, 0.2)';
+        });
+        logoutBtn.addEventListener('mouseleave', function() {
+            this.style.background = 'rgba(255, 255, 255, 0.1)';
+        });
+        
+        userInfo.style.position = 'relative';
+        userInfo.appendChild(logoutBtn);
+    }
+}
+
+// 退出登录功能
+function logout() {
+    // 确认退出
+    if (confirm('确定要退出登录吗？')) {
+        // 清除登录状态
+        sessionStorage.removeItem('isLoggedIn');
+        sessionStorage.removeItem('currentUser');
+        sessionStorage.removeItem('loginTime');
+        
+        // 跳转到登录页面
+        window.location.href = 'login.html';
+    }
+}
 
 // 侧边栏功能
 function initializeSidebar() {
@@ -1144,11 +1237,11 @@ function createDeviceElement(device) {
     
     deviceDiv.innerHTML = `
         <div class="device-header">
-            <div class="device-name">${device.name}</div>
-            <div class="device-status ${device.status}">
-                <i class="${statusIcon[device.status]}"></i>
-                ${statusText[device.status]}
-            </div>
+        <div class="device-name">${device.name}</div>
+        <div class="device-status ${device.status}">
+            <i class="${statusIcon[device.status]}"></i>
+            ${statusText[device.status]}
+        </div>
         </div>
         <div class="device-info">
             <div class="device-location">${device.location} - ${device.type}</div>
@@ -2722,7 +2815,7 @@ function createInventoryTurnoverChart() {
             }
         }
     });
-}
+} 
 
 // 新增：试剂库存热力图
 function createReagentHeatmapChart() {
