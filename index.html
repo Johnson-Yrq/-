@@ -7,8 +7,673 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* 登录页面样式 */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 10000;
+            display: flex;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+
+        .login-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .login-illustration-section {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-logo-section {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            z-index: 10;
+        }
+
+        .login-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .login-logo i {
+            font-size: 28px;
+            color: #fff;
+        }
+
+        .login-illustration {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-medical-illustration {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .login-doctor-figure {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 120px;
+            color: rgba(255, 255, 255, 0.9);
+            animation: loginPulse 3s ease-in-out infinite;
+        }
+
+        .login-data-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .login-data-point {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: white;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: loginFloat 4s ease-in-out infinite;
+        }
+
+        .login-data-point:nth-child(1) {
+            top: 20%;
+            left: 20%;
+            animation-delay: 0s;
+        }
+
+        .login-data-point:nth-child(2) {
+            top: 30%;
+            right: 15%;
+            animation-delay: 0.5s;
+        }
+
+        .login-data-point:nth-child(3) {
+            bottom: 30%;
+            left: 15%;
+            animation-delay: 1s;
+        }
+
+        .login-data-point:nth-child(4) {
+            bottom: 20%;
+            right: 25%;
+            animation-delay: 1.5s;
+        }
+
+        .login-floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .login-float-element {
+            position: absolute;
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            animation: loginFloatAround 8s linear infinite;
+        }
+
+        .login-float-element:nth-child(1) {
+            top: 10%;
+            left: 60%;
+            animation-delay: 0s;
+        }
+
+        .login-float-element:nth-child(2) {
+            top: 60%;
+            left: 10%;
+            animation-delay: 2s;
+        }
+
+        .login-float-element:nth-child(3) {
+            top: 80%;
+            left: 70%;
+            animation-delay: 4s;
+        }
+
+        .login-section {
+            flex: 1;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            box-shadow: -4px 0 64px rgba(0, 0, 0, 0.05);
+        }
+
+        .login-form-container {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .login-welcome-text {
+            margin-bottom: 40px;
+        }
+
+        .login-welcome-text h1 {
+            font-size: 25px;
+            font-weight: 300;
+            color: #000;
+            margin-bottom: 8px;
+        }
+
+        .login-welcome-text h2 {
+            font-size: 31px;
+            font-weight: 500;
+            color: #000;
+            margin-bottom: 8px;
+        }
+
+        .login-welcome-text p {
+            font-size: 16px;
+            font-weight: 400;
+            color: #000;
+            line-height: 1.5;
+        }
+
+        .login-form {
+            margin-bottom: 30px;
+        }
+
+        .login-form-group {
+            margin-bottom: 24px;
+        }
+
+        .login-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .login-input-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .login-input-container input {
+            width: 100%;
+            padding: 16px 50px 16px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        
+        .login-input-container input[type="text"] {
+            padding-right: 50px;
+        }
+        
+        .login-input-container input[type="password"] {
+            padding-right: 50px;
+        }
+
+        .login-input-container input::placeholder {
+            color: #a0a0a0;
+        }
+
+        .login-input-container input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .login-input-container.focused .login-input-icon {
+            color: #667eea;
+        }
+
+        .login-input-icon {
+            position: absolute;
+            right: 16px;
+            font-size: 16px;
+            color: #a0a0a0;
+            transition: color 0.3s ease;
+            pointer-events: none;
+        }
+
+        .login-toggle-password {
+            position: absolute;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: #a0a0a0;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .login-toggle-password:hover {
+            color: #667eea;
+        }
+
+        .login-form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .login-remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .login-remember-me input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #667eea;
+        }
+
+        .login-remember-me label {
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .login-forgot-password {
+            font-size: 14px;
+            color: #667eea;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .login-forgot-password:hover {
+            color: #5a6fd8;
+            text-decoration: underline;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+        }
+
+        .login-button-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .login-button:hover .login-button-icon {
+            transform: translateX(4px);
+        }
+
+        .login-error-message {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 16px;
+            padding: 12px;
+            background: rgba(231, 76, 60, 0.1);
+            border-radius: 6px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .login-footer-text {
+            text-align: center;
+        }
+
+        .login-footer-text p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .login-footer-text a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-footer-text a:hover {
+            text-decoration: underline;
+        }
+
+        .login-loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+        }
+
+        .login-loading-spinner {
+            text-align: center;
+            color: white;
+        }
+
+        .login-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: loginSpin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        .login-loading-spinner p {
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .login-success-message {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #27ae60;
+            font-size: 14px;
+            margin-top: 16px;
+            padding: 12px;
+            background: rgba(39, 174, 96, 0.1);
+            border-radius: 6px;
+            border-left: 4px solid #27ae60;
+            animation: loginSlideIn 0.3s ease-out;
+        }
+
+        .login-shake {
+            animation: loginShake 0.5s ease-in-out;
+        }
+
+        /* 登录页面动画 */
+        @keyframes loginPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
+        }
+
+        @keyframes loginFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes loginFloatAround {
+            0% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-10px) rotate(90deg); }
+            50% { transform: translateY(0px) rotate(180deg); }
+            75% { transform: translateY(10px) rotate(270deg); }
+            100% { transform: translateY(0px) rotate(360deg); }
+        }
+
+        @keyframes loginSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes loginSlideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes loginShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .login-overlay {
+                flex-direction: column;
+            }
+            
+            .login-illustration-section {
+                flex: 0 0 40%;
+            }
+            
+            .login-illustration {
+                width: 300px;
+                height: 300px;
+            }
+            
+            .login-doctor-figure {
+                font-size: 80px;
+            }
+            
+            .login-data-point {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .login-section {
+                padding: 20px;
+            }
+            
+            .login-logo-section {
+                top: 20px;
+                left: 20px;
+            }
+            
+            .login-logo {
+                font-size: 18px;
+            }
+            
+            .login-logo i {
+                font-size: 24px;
+            }
+            
+            .login-welcome-text h1 {
+                font-size: 22px;
+            }
+            
+            .login-welcome-text h2 {
+                font-size: 28px;
+            }
+            
+            .login-illustration {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .login-doctor-figure {
+                font-size: 60px;
+            }
+            
+            .login-data-point {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-form-options {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+            
+            .login-illustration-section {
+                flex: 0 0 30%;
+            }
+            
+            .login-illustration {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .login-doctor-figure {
+                font-size: 50px;
+            }
+            
+            .login-data-point {
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- 登录页面覆盖层 -->
+    <div class="login-overlay" id="loginOverlay">
+        <!-- 左侧插图区域 -->
+        <div class="login-illustration-section">
+            <div class="login-logo-section">
+                <div class="login-logo">
+                    <i class="fas fa-hospital"></i>
+                    <span>德国骨科医院</span>
+                </div>
+            </div>
+            
+            <div class="login-illustration">
+                <div class="login-medical-illustration">
+                    <div class="login-doctor-figure">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div class="login-data-elements">
+                        <div class="login-data-point">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="login-data-point">
+                            <i class="fas fa-microscope"></i>
+                        </div>
+                        <div class="login-data-point">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <div class="login-data-point">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                    </div>
+                    <div class="login-floating-elements">
+                        <div class="login-float-element">
+                            <i class="fas fa-dna"></i>
+                        </div>
+                        <div class="login-float-element">
+                            <i class="fas fa-pills"></i>
+                        </div>
+                        <div class="login-float-element">
+                            <i class="fas fa-stethoscope"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧登录表单区域 -->
+        <div class="login-section">
+            <div class="login-form-container">
+                <div class="login-welcome-text">
+                    <h1>欢迎!</h1>
+                    <h2>登录到</h2>
+                    <p>德国骨科医院检验大数据中心</p>
+                </div>
+
+                <form class="login-form" id="loginForm">
+                    <div class="login-form-group">
+                        <label for="username">用户名</label>
+                        <div class="login-input-container">
+                            <input type="text" id="username" name="username" placeholder="请输入您的用户名" required>
+                            <i class="fas fa-user login-input-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="login-form-group">
+                        <label for="password">密码</label>
+                        <div class="login-input-container">
+                            <input type="password" id="password" name="password" placeholder="请输入您的密码" required>
+                            <button type="button" class="login-toggle-password" id="togglePassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="login-form-options">
+                        <div class="login-remember-me">
+                            <input type="checkbox" id="rememberMe" name="rememberMe">
+                            <label for="rememberMe">记住我</label>
+                        </div>
+                        <a href="#" class="login-forgot-password">忘记密码？</a>
+                    </div>
+
+                    <button type="submit" class="login-button">
+                        <span class="login-button-text">登录</span>
+                        <i class="fas fa-arrow-right login-button-icon"></i>
+                    </button>
+
+                    <div class="login-error-message" id="errorMessage">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>用户名或密码错误，请重试</span>
+                    </div>
+                </form>
+
+                <div class="login-footer-text">
+                    <p>没有账户？ <a href="#">联系管理员</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载动画 -->
+    <div class="login-loading-overlay" id="loadingOverlay">
+        <div class="login-loading-spinner">
+            <div class="login-spinner"></div>
+            <p>正在登录...</p>
+        </div>
+    </div>
+
     <!-- 侧边导航栏 -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -77,6 +742,9 @@
                     <div class="user-name">管理员</div>
                     <div class="user-role">系统管理员</div>
                 </div>
+                <button class="logout-btn" onclick="logout()" title="登出">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
             </div>
         </div>
     </nav>
@@ -104,6 +772,10 @@
                     <i class="fas fa-bell"></i>
                     <span class="notification-badge">3</span>
                 </div>
+                <button class="topbar-logout-btn" onclick="logout()" title="登出系统">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>登出</span>
+                </button>
             </div>
         </header>
 

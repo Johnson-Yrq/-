@@ -1,13 +1,268 @@
-// 全局变量
-let charts = {};
-let currentTheme = 'light';
-let dataUpdateInterval;
-let sidebarCollapsed = false;
+// 登录功能相关代码
+let isLoggedIn = false;
 
-// 初始化页面
-document.addEventListener('DOMContentLoaded', function() {
-    // 首先检查登录状态
+// 登录页面初始化
+function initializeLogin() {
+    // 获取DOM元素
+    const loginForm = document.getElementById('loginForm');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    const errorMessage = document.getElementById('errorMessage');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const rememberMeCheckbox = document.getElementById('rememberMe');
+    const loginOverlay = document.getElementById('loginOverlay');
+
+    // 预定义的登录凭据
+    const validCredentials = {
+        username: 'admin',
+        password: 'test123'
+    };
+
+    // 检查是否已经登录
     checkLoginStatus();
+
+    // 密码显示/隐藏切换
+    if (togglePasswordBtn) {
+        togglePasswordBtn.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            const icon = this.querySelector('i');
+            if (type === 'text') {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    }
+
+    // 输入框焦点效果
+    const inputs = [usernameInput, passwordInput];
+    inputs.forEach(input => {
+        if (input) {
+            input.addEventListener('focus', function() {
+                this.parentElement.classList.add('focused');
+                hideErrorMessage();
+            });
+
+            input.addEventListener('blur', function() {
+                if (!this.value) {
+                    this.parentElement.classList.remove('focused');
+                }
+            });
+
+            // 输入时隐藏错误消息
+            input.addEventListener('input', function() {
+                hideErrorMessage();
+            });
+        }
+    });
+
+    // 表单提交处理
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+
+            // 基本验证
+            if (!username || !password) {
+                showErrorMessage('请填写用户名和密码');
+                return;
+            }
+
+            // 显示加载动画
+            showLoading();
+
+            // 模拟登录验证延迟
+            setTimeout(() => {
+                if (validateCredentials(username, password)) {
+                    // 登录成功
+                    handleSuccessfulLogin(username);
+                } else {
+                    // 登录失败
+                    hideLoading();
+                    showErrorMessage('用户名或密码错误，请重试');
+                    
+                    // 清空密码字段
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                    
+                    // 添加震动效果
+                    loginForm.classList.add('login-shake');
+                    setTimeout(() => {
+                        loginForm.classList.remove('login-shake');
+                    }, 500);
+                }
+            }, 1500); // 模拟网络延迟
+        });
+    }
+
+    // 验证登录凭据
+    function validateCredentials(username, password) {
+        return username === validCredentials.username && password === validCredentials.password;
+    }
+
+    // 处理成功登录
+    function handleSuccessfulLogin(username) {
+        // 如果选择了记住我，保存到localStorage
+        if (rememberMeCheckbox && rememberMeCheckbox.checked) {
+            localStorage.setItem('rememberedUsername', username);
+        } else {
+            localStorage.removeItem('rememberedUsername');
+        }
+
+        // 保存登录状态
+        sessionStorage.setItem('isLoggedIn', 'true');
+        sessionStorage.setItem('currentUser', username);
+        sessionStorage.setItem('loginTime', new Date().toISOString());
+
+        // 显示成功消息
+        showSuccessMessage();
+
+        // 延迟隐藏登录页面并显示主界面
+        setTimeout(() => {
+            hideLoginPage();
+            isLoggedIn = true;
+            // 初始化主页面
+            initializeMainApp();
+        }, 2000);
+    }
+
+    // 隐藏登录页面
+    function hideLoginPage() {
+        if (loginOverlay) {
+            loginOverlay.classList.add('hidden');
+            setTimeout(() => {
+                loginOverlay.style.display = 'none';
+            }, 500);
+        }
+    }
+
+    // 显示成功消息
+    function showSuccessMessage() {
+        hideLoading();
+        
+        // 创建成功消息元素
+        const successMessage = document.createElement('div');
+        successMessage.className = 'login-success-message';
+        successMessage.innerHTML = `
+            <i class="fas fa-check-circle"></i>
+            <span>登录成功！正在进入系统...</span>
+        `;
+        
+        // 插入成功消息
+        if (loginForm) {
+            loginForm.appendChild(successMessage);
+        }
+    }
+
+    // 显示错误消息
+    function showErrorMessage(message) {
+        if (errorMessage) {
+            errorMessage.querySelector('span').textContent = message;
+            errorMessage.style.display = 'flex';
+            errorMessage.style.animation = 'loginSlideIn 0.3s ease-out';
+        }
+    }
+
+    // 隐藏错误消息
+    function hideErrorMessage() {
+        if (errorMessage) {
+            errorMessage.style.display = 'none';
+        }
+    }
+
+    // 显示加载动画
+    function showLoading() {
+        if (loadingOverlay) {
+            loadingOverlay.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    // 隐藏加载动画
+    function hideLoading() {
+        if (loadingOverlay) {
+            loadingOverlay.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    }
+
+    // 页面加载时检查是否有记住的用户名
+    function checkRememberedUser() {
+        const rememberedUsername = localStorage.getItem('rememberedUsername');
+        if (rememberedUsername && usernameInput) {
+            usernameInput.value = rememberedUsername;
+            if (rememberMeCheckbox) {
+                rememberMeCheckbox.checked = true;
+            }
+            usernameInput.parentElement.classList.add('focused');
+            if (passwordInput) {
+                passwordInput.focus();
+            }
+        }
+    }
+
+    // 检查是否已经登录
+    function checkLoginStatus() {
+        const loginStatus = sessionStorage.getItem('isLoggedIn');
+        if (loginStatus === 'true') {
+            // 如果已经登录，直接隐藏登录页面
+            isLoggedIn = true;
+            hideLoginPage();
+            initializeMainApp();
+        } else {
+            // 检查记住的用户名
+            checkRememberedUser();
+        }
+    }
+
+    // 添加键盘快捷键支持
+    document.addEventListener('keydown', function(e) {
+        // Enter键提交表单
+        if (e.key === 'Enter' && (usernameInput === document.activeElement || passwordInput === document.activeElement)) {
+            if (loginForm) {
+                loginForm.dispatchEvent(new Event('submit'));
+            }
+        }
+        
+        // Escape键清空表单
+        if (e.key === 'Escape') {
+            if (usernameInput) usernameInput.value = '';
+            if (passwordInput) passwordInput.value = '';
+            hideErrorMessage();
+        }
+    });
+
+    // 添加登出功能
+    window.logout = function() {
+        sessionStorage.removeItem('isLoggedIn');
+        sessionStorage.removeItem('currentUser');
+        sessionStorage.removeItem('loginTime');
+        isLoggedIn = false;
+        
+        // 显示登录页面
+        if (loginOverlay) {
+            loginOverlay.style.display = 'flex';
+            loginOverlay.classList.remove('hidden');
+        }
+        
+        // 清空表单
+        if (usernameInput) usernameInput.value = '';
+        if (passwordInput) passwordInput.value = '';
+        if (rememberMeCheckbox) rememberMeCheckbox.checked = false;
+        hideErrorMessage();
+    };
+}
+
+// 初始化主应用程序
+function initializeMainApp() {
+    if (!isLoggedIn) return;
     
     initializeTheme();
     initializeTime();
@@ -17,97 +272,19 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeDeviceGrid();
     startDataUpdates();
     setupEventListeners();
-    
-    // 初始化用户信息
-    initializeUserInfo();
+}
+
+// 全局变量
+let charts = {};
+let currentTheme = 'light';
+let dataUpdateInterval;
+let sidebarCollapsed = false;
+
+// 初始化页面
+document.addEventListener('DOMContentLoaded', function() {
+    // 首先初始化登录功能
+    initializeLogin();
 });
-
-// 检查登录状态
-function checkLoginStatus() {
-    const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-    const currentUser = sessionStorage.getItem('currentUser');
-    
-    if (!isLoggedIn || isLoggedIn !== 'true' || !currentUser) {
-        // 未登录，跳转到登录页面
-        window.location.href = 'login.html';
-        return false;
-    }
-    
-    return true;
-}
-
-// 初始化用户信息
-function initializeUserInfo() {
-    const currentUser = sessionStorage.getItem('currentUser');
-    const loginTime = sessionStorage.getItem('loginTime');
-    
-    if (currentUser) {
-        // 更新用户信息显示
-        const userNameElement = document.querySelector('.user-name');
-        const userRoleElement = document.querySelector('.user-role');
-        
-        if (userNameElement) {
-            userNameElement.textContent = currentUser === 'admin' ? '管理员' : currentUser;
-        }
-        
-        if (userRoleElement) {
-            userRoleElement.textContent = '系统管理员';
-        }
-        
-        // 添加退出登录功能
-        addLogoutFunctionality();
-    }
-}
-
-// 添加退出登录功能
-function addLogoutFunctionality() {
-    const userInfo = document.querySelector('.user-info');
-    if (userInfo) {
-        // 创建退出按钮
-        const logoutBtn = document.createElement('button');
-        logoutBtn.className = 'logout-btn';
-        logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i>';
-        logoutBtn.title = '退出登录';
-        logoutBtn.style.cssText = `
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: white;
-            padding: 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        `;
-        
-        logoutBtn.addEventListener('click', logout);
-        logoutBtn.addEventListener('mouseenter', function() {
-            this.style.background = 'rgba(255, 255, 255, 0.2)';
-        });
-        logoutBtn.addEventListener('mouseleave', function() {
-            this.style.background = 'rgba(255, 255, 255, 0.1)';
-        });
-        
-        userInfo.style.position = 'relative';
-        userInfo.appendChild(logoutBtn);
-    }
-}
-
-// 退出登录功能
-function logout() {
-    // 确认退出
-    if (confirm('确定要退出登录吗？')) {
-        // 清除登录状态
-        sessionStorage.removeItem('isLoggedIn');
-        sessionStorage.removeItem('currentUser');
-        sessionStorage.removeItem('loginTime');
-        
-        // 跳转到登录页面
-        window.location.href = 'login.html';
-    }
-}
 
 // 侧边栏功能
 function initializeSidebar() {
